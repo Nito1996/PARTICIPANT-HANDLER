@@ -42,7 +42,7 @@ namespace participantHandler
         public static void OperationHandler()
         {
             string userInput = Console.ReadLine();
-            if (!Regex.IsMatch(userInput, mainRegex))
+            if ((!ValidateUser(userInput, mainRegex)))
             {
                 Console.WriteLine("Invalid Input. Please enter a valid numeric value from 1 to 4.");
                 Console.WriteLine("");
@@ -73,9 +73,9 @@ namespace participantHandler
             }
             Console.WriteLine("");
         }
-        public static bool ValidateUser(string user)
+        public static bool ValidateUser(string user, string regex)
         {
-            if (!Regex.IsMatch(user, userRegex))
+            if (!Regex.IsMatch(user, regex))
             {
                 return false;
             }
@@ -88,9 +88,9 @@ namespace participantHandler
             string name = Console.ReadLine();
             Console.WriteLine("");
 
-            if (!ValidateUser(name))
+            if (!ValidateUser(name, userRegex))
             {
-                Console.WriteLine("Invalid entry. Please enter a valid name.");   
+                Console.WriteLine("Invalid entry. Please enter a valid name.");
                 return;
             }
 
@@ -98,7 +98,7 @@ namespace participantHandler
             string lastName = Console.ReadLine();
             Console.WriteLine("");
 
-            if (!ValidateUser(lastName))
+            if (!ValidateUser(lastName, userRegex))
             {
                 Console.WriteLine("Invalid entry. Please enter a valid lastName.");
                 return;
@@ -114,7 +114,7 @@ namespace participantHandler
             string name = Console.ReadLine();
             Console.WriteLine("");
 
-            if (!ValidateUser(name))
+            if (!ValidateUser(name, userRegex))
             {
                 Console.WriteLine("Invalid entry. Please enter a valid name.");
                 Console.WriteLine("");
@@ -125,7 +125,7 @@ namespace participantHandler
             string lastName = Console.ReadLine();
             Console.WriteLine("");
 
-            if (!ValidateUser(lastName))
+            if (!ValidateUser(lastName, userRegex))
             {
                 Console.WriteLine("Invalid entry. Please enter a valid lastName.");
                 Console.WriteLine("");
