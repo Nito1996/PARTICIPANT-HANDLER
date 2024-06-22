@@ -9,6 +9,7 @@ namespace participantHandler
         static readonly string mainRegex = @"^[1-4]$";
         static readonly string userRegex = @"^[a-zA-Z]{2,10}$";
         public static IManage manage = new Manage();
+        public static IList<Person> participants = manage.GetParticipants();
         public static bool exitRequested = false;
 
         public enum MenuOption
@@ -23,7 +24,7 @@ namespace participantHandler
             do
             {
                 ShowMenu();
-                OperationHandler();
+                VerifyUserInput();
             } while (!exitRequested);
         }
 
@@ -39,20 +40,20 @@ namespace participantHandler
             Console.WriteLine("");
         }
 
-        public static void OperationHandler()
+        public static void VerifyUserInput()
         {
             string userInput = Console.ReadLine();
-            if ((!ValidateUser(userInput, mainRegex)))
+            if ((!ValidateUserInput(userInput, mainRegex)))
             {
                 Console.WriteLine("Invalid Input. Please enter a valid numeric value from 1 to 4.");
                 Console.WriteLine("");
                 return;
             }
             Console.WriteLine("");
-            OperationExcuter(userInput);
+            HandleUserInput(userInput);
         }
 
-        public static void OperationExcuter(string userInput)
+        public static void HandleUserInput(string userInput)
         {
             MenuOption option = Enum.Parse<MenuOption>(userInput);
 
@@ -73,13 +74,9 @@ namespace participantHandler
             }
             Console.WriteLine("");
         }
-        public static bool ValidateUser(string user, string regex)
+        public static bool ValidateUserInput(string user, string regex)
         {
-            if (!Regex.IsMatch(user, regex))
-            {
-                return false;
-            }
-            return true;
+            return Regex.IsMatch(user, regex);
         }
 
         public static void AddUser()
@@ -88,7 +85,7 @@ namespace participantHandler
             string name = Console.ReadLine();
             Console.WriteLine("");
 
-            if (!ValidateUser(name, userRegex))
+            if (!ValidateUserInput(name, userRegex))
             {
                 Console.WriteLine("Invalid entry. Please enter a valid name.");
                 return;
@@ -98,58 +95,58 @@ namespace participantHandler
             string lastName = Console.ReadLine();
             Console.WriteLine("");
 
-            if (!ValidateUser(lastName, userRegex))
+            if (!ValidateUserInput(lastName, userRegex))
             {
                 Console.WriteLine("Invalid entry. Please enter a valid lastName.");
                 return;
             }
 
-            Manage.Add(name, lastName);
+            manage.Add(name, lastName);
             Console.WriteLine($"Operation Succeeded: {name} {lastName} has been successfully enrolled to this program.");
         }
 
         public static void RemoveUser()
         {
-            Console.WriteLine("Please enter a valid name:");
-            string name = Console.ReadLine();
-            Console.WriteLine("");
-
-            if (!ValidateUser(name, userRegex))
+            ShowUsers();
+            if (participants.Count == 0)
             {
-                Console.WriteLine("Invalid entry. Please enter a valid name.");
-                Console.WriteLine("");
+                Console.WriteLine("Nothing to be removed, program is empty.");
                 return;
             }
 
-            Console.WriteLine("Please enter a valid lastName:");
-            string lastName = Console.ReadLine();
-            Console.WriteLine("");
+            Console.WriteLine();
+            Console.WriteLine("Please enter a valid numeric index of a participant to be removed:");
+            string input = Console.ReadLine();
 
-            if (!ValidateUser(lastName, userRegex))
+            if (!ValidateUserInput(input, @"^\d+$"))
             {
-                Console.WriteLine("Invalid entry. Please enter a valid lastName.");
-                Console.WriteLine("");
+                Console.WriteLine();
+                Console.WriteLine("Invalid entry. Please enter a valid index.");
                 return;
             }
 
-            if (Manage.Remove(name, lastName))
+            Console.WriteLine();
+            try
             {
-                Console.WriteLine($"Operation Succeeded: {name} {lastName} has been successfully removed from this program.");
-                return;
+                var removedParticipant = manage.GetParticipants()[int.Parse(input)];
+                manage.Remove(int.Parse(input)); 
+                Console.WriteLine($"Operation Succeeded: {removedParticipant.Name} {removedParticipant.LastName} has been successfully removed from this program.");
             }
-
-            Console.WriteLine("Invalid Entry. That person doesn't exist in the current Matrix");
+            catch (ArgumentOutOfRangeException ex)
+            {    
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public static void ShowUsers()
         {
-            IList<Person> participants = manage.GetParticipants();
+            var participants = manage.GetParticipants();
             Console.WriteLine("Enrolled participants:");
-            foreach (var participant in participants)
+            for (int i = 0; i < participants.Count; i++)
             {
-                Console.WriteLine($"{participant.Name} {participant.LastName}");
+                Console.WriteLine($"{i}. {participants[i].Name} {participants[i].LastName}");
             }
-            Console.WriteLine("");
+            Console.WriteLine("----------------------------------------------");
         }
 
         public static void LogOutConfirm()
